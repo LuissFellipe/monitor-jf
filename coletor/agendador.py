@@ -50,6 +50,7 @@ def executar():
         conn.commit()
         executar_fonte(conn, "CEMIG", cemig.coletar)
         executar_fonte(conn, "Cesama", cesama.coletar)
+        alertas.sincronizar_locais(conn, alertas.carregar_locais())
     dbt = subprocess.run(["dbt", "build", "--profiles-dir", "dbt_monitor", "--project-dir", "dbt_monitor"],
                          capture_output=True, text=True)
     print(dbt.stdout[-1500:], dbt.stderr[-1500:], flush=True)

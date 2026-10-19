@@ -10,7 +10,7 @@ Avisa no Telegram quando a **CEMIG** programa um desligamento de energia ou quan
 API da CEMIG (JSON) ─────┐                                   ┌─► Telegram
  373 bairros de JF       │                                   │   "⏰ AMANHÃ: 10:00–17:00 Rua X"
                          ├─► coletor (07h e 19h) ─► Postgres ┤
-Site da Cesama (HTML) ───┘    │  raw.*                       └─► dashboard Streamlit (:8502)
+Site da Cesama (HTML) ───┘    │  raw.*                       └─► Grafana (:3000)
  notícias de abastecimento    │                                   meus locais, cidade, histórico,
                               ▼                                   saúde da coleta
                          dbt build
@@ -34,6 +34,9 @@ Site da Cesama (HTML) ───┘    │  raw.*                       └─►
 - **Alertas sem repetição:** cada desligamento gera no máximo um aviso de "novo", um de "amanhã" e um de "cancelado". Ruas do mesmo dia vão juntas numa única mensagem.
 - **Monitoramento do próprio robô:** cada coleta é registrada em `raw.execucoes`. Se a API mudar de formato ou devolver menos bairros do que o esperado, chega um alerta de falha. `marts.fct_saude_coleta` marca uma fonte como atrasada depois de 24h sem sucesso.
 
+- **Grafana provisionado como código:** a fonte de dados e o painel ficam versionados em `grafana/`. O JSON do painel é gerado por `grafana/gerar_dashboard.py`, para não editar à mão 17 painéis de JSON. O `docker compose up` já sobe tudo pronto, sem nenhum clique.
+- **Locais no banco:** o coletor grava o `config.toml` em `raw.locais`, e o modelo `marts.fct_meus_locais` cruza seus endereços com os desligamentos. Assim a mesma regra serve o painel e pode ser testada pelo dbt.
+
 ## Como rodar
 
 ```bash
@@ -42,6 +45,6 @@ make up         # cria config.toml e .env a partir dos exemplos e sobe tudo
 
 1. Em `config.toml`, coloque seus locais. Pode ser só o bairro ou rua + número, escritos como na conta de luz.
 2. Para receber no Telegram, crie um bot com o @BotFather e preencha `TELEGRAM_TOKEN` e `TELEGRAM_CHAT_ID` no `.env`. Sem isso, os alertas aparecem só no log e no dashboard.
-3. O dashboard fica em http://localhost:8502.
+3. O painel do Grafana fica em http://localhost:3000. Ele abre sem login, em modo leitura. Para editar, entre como `admin` com a senha `admin` ou a definida em `GRAFANA_SENHA`.
 
 `make testes` roda os testes de extração de datas e bairros e de correspondência de endereço. `make logs` acompanha a coleta.

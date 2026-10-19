@@ -24,6 +24,15 @@ def carregar_locais(caminho=CONFIG):
     ]
 
 
+def sincronizar_locais(conn, locais):
+    conn.execute("delete from raw.locais")
+    with conn.cursor() as cur:
+        cur.executemany(
+            "insert into raw.locais (nome, bairros, rua, numero) values (%s, %s, %s, %s)",
+            [(l["nome"], sorted(l["bairros"]), l["rua"], l["numero"]) for l in locais],
+        )
+
+
 def numeros_da_lista(texto):
     return {n.strip() for n in texto.split(",") if n.strip()}
 

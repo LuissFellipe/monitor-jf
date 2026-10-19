@@ -1,0 +1,695 @@
+{
+  "uid": "monitor-jf",
+  "title": "Monitor de luz e água — Juiz de Fora",
+  "tags": [
+    "cemig",
+    "cesama",
+    "juiz de fora"
+  ],
+  "timezone": "browser",
+  "refresh": "5m",
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "schemaVersion": 39,
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Meus locais",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Interrupções programadas nos meus locais",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select count(*) as total from marts.fct_meus_locais where data >= current_date"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "Próximas interrupções nos meus locais",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 1,
+        "w": 18,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select local, servico, to_char(data, 'DD/MM') || ' (' || (array['dom','seg','ter','qua','qui','sex','sáb'])[extract(dow from data)::int + 1] || ')' as dia, horario, bairro, detalhe, situacao\n          from marts.fct_meus_locais where data >= current_date order by data, local"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Nenhuma interrupção programada nos seus locais",
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      }
+    },
+    {
+      "id": 4,
+      "type": "table",
+      "title": "Locais monitorados",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select nome as local, array_to_string(bairros, ', ') as bairros, rua, numero from raw.locais"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Sem registros",
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      }
+    },
+    {
+      "id": 5,
+      "type": "row",
+      "title": "Próximos dias em Juiz de Fora",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Ruas com desligamento de luz",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select count(*) from marts.fct_interrupcoes where servico = 'luz' and data >= current_date"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Bairros afetados (luz)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 10,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select count(distinct bairro) from marts.fct_interrupcoes where servico = 'luz' and data >= current_date"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Avisos de água ativos",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 10,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select count(distinct local) from marts.fct_interrupcoes where servico = 'agua' and data >= current_date"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "color": {
+            "mode": "thresholds"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "value",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": "barchart",
+      "title": "Ruas sem luz por dia",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 8,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select to_char(data, 'DD/MM') || ' (' || (array['dom','seg','ter','qua','qui','sex','sáb'])[extract(dow from data)::int + 1] || ')' as dia, count(*) as ruas\n          from marts.fct_interrupcoes where servico = 'luz' and data >= current_date\n          group by data order by data"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "orange"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "auto",
+        "showValue": "always",
+        "legend": {
+          "showLegend": false
+        },
+        "xTickLabelRotation": 0
+      }
+    },
+    {
+      "id": 10,
+      "type": "table",
+      "title": "Desligamentos programados (CEMIG)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 14,
+        "w": 16,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select to_char(data, 'DD/MM') || ' (' || (array['dom','seg','ter','qua','qui','sex','sáb'])[extract(dow from data)::int + 1] || ')' as dia, to_char(inicio, 'HH24:MI') || '–' || to_char(termino, 'HH24:MI') as horario,\n                 bairro, logradouro, status\n          from staging.stg_cemig__desligamentos where data >= current_date order by data, bairro, logradouro"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Sem registros",
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      }
+    },
+    {
+      "id": 11,
+      "type": "row",
+      "title": "Histórico",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 12,
+      "type": "bargauge",
+      "title": "Bairros com mais interrupções registradas",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select bairro, dias_sem_luz + avisos_agua as ocorrencias\n          from marts.agg_bairros order by posicao limit 15"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-YlRd"
+          },
+          "min": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient",
+        "showUnfilled": true,
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": true
+        }
+      }
+    },
+    {
+      "id": 13,
+      "type": "table",
+      "title": "Avisos de abastecimento (Cesama)",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 12
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select to_char(coalesce(data_evento, publicado_em), 'DD/MM/YYYY') as data, titulo,\n                 array_to_string(bairros, ', ') as bairros\n          from raw.cesama_avisos order by coalesce(data_evento, publicado_em) desc"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Sem registros",
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      }
+    },
+    {
+      "id": 14,
+      "type": "row",
+      "title": "Saúde da coleta",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 36,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 15,
+      "type": "table",
+      "title": "Situação por fonte",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 37,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select fonte, ultima_coleta_ok, ultima_falha, execucoes_7d, falhas_7d,\n                 case when atrasada then 'ATRASADA' else 'OK' end as situacao\n          from marts.fct_saude_coleta order by fonte"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Sem registros",
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Registros por coleta",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 37,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "time_series",
+          "rawSql": "select fim as time, fonte as metric, registros as value\n          from raw.execucoes where sucesso order by fim"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "points",
+            "pointSize": 8
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 17,
+      "type": "table",
+      "title": "Alertas enviados",
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "monitor-pg"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 43,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "monitor-pg"
+          },
+          "rawQuery": true,
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "select enviado_em, local, tipo, entregue, mensagem from raw.alertas order by enviado_em desc limit 50"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "Nenhum alerta enviado ainda",
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      }
+    }
+  ]
+}

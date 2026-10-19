@@ -30,16 +30,21 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  dashboard:
-    build: ./dashboard
+  grafana:
+    image: grafana/grafana-oss:11.3.0
     environment:
-      DATABASE_URL: postgresql+psycopg://monitor:monitor@postgres:5432/monitor
-      CONFIG_LOCAIS: /config/config.toml
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_SENHA:-admin}
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/monitor-jf.json
+      GF_USERS_DEFAULT_LANGUAGE: pt-BR
       TZ: America/Sao_Paulo
     volumes:
-      - ./config.toml:/config/config.toml:ro
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     ports:
-      - "8502:8501"
+      - "3000:3000"
     depends_on:
       postgres:
         condition: service_healthy

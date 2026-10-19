@@ -17,3 +17,11 @@ models:
     columns:
       - name: fonte
         tests: [unique]
+  - name: fct_meus_locais
+    description: Interrupções de luz e água que atingem os locais do config.toml
+    columns:
+      - name: servico
+        tests:
+          - accepted_values:
+              arguments:
+                values: [luz, agua]

@@ -38,6 +38,12 @@ create table if not exists raw.execucoes (
     registros int,
     erro text
 );
+create table if not exists raw.locais (
+    nome text primary key,
+    bairros text[] not null,
+    rua text,
+    numero text
+);
 create table if not exists raw.alertas (
     chave text primary key,
     local text not null,

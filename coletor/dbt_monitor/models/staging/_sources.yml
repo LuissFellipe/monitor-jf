@@ -7,3 +7,5 @@ sources:
       - name: cemig_desligamentos
       - name: cesama_avisos
       - name: execucoes
+      - name: locais
+      - name: alertas
