@@ -1,0 +1,12 @@
+dbt_monitor:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('PGHOST', 'localhost') }}"
+      port: "{{ env_var('PGPORT', '5435') | int }}"
+      user: "{{ env_var('PGUSER', 'monitor') }}"
+      password: "{{ env_var('PGPASSWORD', 'monitor') }}"
+      dbname: "{{ env_var('PGDATABASE', 'monitor') }}"
+      schema: public
+      threads: 4

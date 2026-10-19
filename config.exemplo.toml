@@ -1,0 +1,9 @@
+[[locais]]
+nome = "Casa"
+bairros = ["Centro"]
+rua = "Rua Halfeld"
+numero = 100
+
+[[locais]]
+nome = "Trabalho"
+bairros = ["São Mateus", "Bom Pastor"]

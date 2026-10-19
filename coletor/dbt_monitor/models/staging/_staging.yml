@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: stg_cemig__desligamentos
+    columns:
+      - name: data
+        tests: [not_null]
+      - name: bairro
+        tests: [not_null]
+      - name: duracao_horas
+        tests:
+          - duracao_positiva
+  - name: stg_cesama__avisos
+    columns:
+      - name: url
+        tests: [not_null]
+      - name: bairro
+        tests: [not_null]

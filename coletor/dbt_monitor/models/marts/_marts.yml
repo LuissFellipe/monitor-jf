@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: fct_interrupcoes
+    description: Interrupções de luz (CEMIG) e avisos de água (Cesama) por bairro e data
+    columns:
+      - name: servico
+        tests:
+          - accepted_values:
+              arguments:
+                values: [luz, agua]
+  - name: agg_bairros
+    columns:
+      - name: bairro
+        tests: [unique, not_null]
+  - name: fct_saude_coleta
+    columns:
+      - name: fonte
+        tests: [unique]
