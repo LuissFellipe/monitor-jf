@@ -1,0 +1,29 @@
+name: Testes
+
+# Não sobe o coletor: ele chamaria a API da CEMIG a cada push. Aqui ficam as
+# verificações que não dependem de rede: extração de texto, projeto dbt e o
+# painel do Grafana gerado como código.
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r coletor/requirements.txt
+      - name: Extração de datas, bairros e endereços
+        run: python -m pytest -q
+      - name: Projeto dbt compila
+        working-directory: coletor/dbt_monitor
+        run: dbt parse --profiles-dir .
+      - name: Painel versionado é o que o gerador produz
+        run: |
+          python grafana/gerar_dashboard.py
+          git diff --exit-code grafana/dashboards/

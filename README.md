@@ -4,6 +4,10 @@ Avisa no Telegram quando a **CEMIG** programa um desligamento de energia ou quan
 
 **Pergunta:** vai faltar luz ou água em casa nos próximos dias? E quais bairros de Juiz de Fora mais ficam sem esses serviços?
 
+![Painéis da cidade no Grafana: desligamentos dos próximos dias e histórico por bairro](docs/grafana.png)
+
+*Só os painéis da cidade, com dados que a CEMIG e a Cesama publicam. Os painéis "Meus locais" e "Alertas enviados" ficam de fora da imagem porque mostram os endereços monitorados.*
+
 ## Arquitetura
 
 ```
@@ -48,3 +52,5 @@ make up         # cria config.toml e .env a partir dos exemplos e sobe tudo
 3. O painel do Grafana fica em http://localhost:3000. Ele abre sem login, em modo leitura. Para editar, entre como `admin` com a senha `admin` ou a definida em `GRAFANA_SENHA`.
 
 `make testes` roda os testes de extração de datas e bairros e de correspondência de endereço. `make logs` acompanha a coleta.
+
+O GitHub Actions roda, a cada push, os testes de extração, o `dbt parse` e confere se o JSON do painel versionado é o mesmo que `grafana/gerar_dashboard.py` produz. O coletor não roda no CI, para não chamar a API da CEMIG a cada push.

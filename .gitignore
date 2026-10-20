@@ -5,3 +5,4 @@ __pycache__/
 .pytest_cache/
 coletor/dbt_monitor/target/
 coletor/dbt_monitor/logs/
+coletor/dbt_monitor/.user.yml
