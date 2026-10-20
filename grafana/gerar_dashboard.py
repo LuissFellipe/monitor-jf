@@ -80,8 +80,11 @@ tabela("Desligamentos programados (CEMIG)",
 
 linha("Histórico", 23)
 painel("bargauge", "Bairros com mais interrupções registradas",
-       """select bairro, dias_sem_luz + avisos_agua as ocorrencias
-          from marts.agg_bairros order by posicao limit 15""",
+       """select bairro,
+                 count(distinct data) filter (where servico = 'luz')
+                 + count(distinct local) filter (where servico = 'agua' and bairro <> 'Nao Identificado') as ocorrencias
+          from marts.fct_interrupcoes where $__timeFilter(data)
+          group by bairro order by ocorrencias desc limit 15""",
        0, 24, 12, 12,
        fieldConfig={"defaults": {"color": {"mode": "continuous-YlRd"}, "min": 0}, "overrides": []},
        options={"orientation": "horizontal", "displayMode": "gradient", "showUnfilled": True,
@@ -89,7 +92,7 @@ painel("bargauge", "Bairros com mais interrupções registradas",
 tabela("Avisos de abastecimento (Cesama)",
        """select to_char(coalesce(data_evento, publicado_em), 'DD/MM/YYYY') as data, titulo,
                  array_to_string(bairros, ', ') as bairros
-          from raw.cesama_avisos order by coalesce(data_evento, publicado_em) desc""",
+          from raw.cesama_avisos where $__timeFilter(coalesce(data_evento, publicado_em)) order by coalesce(data_evento, publicado_em) desc""",
        12, 24, 12, 12)
 
 linha("Saúde da coleta", 36)
@@ -100,11 +103,11 @@ tabela("Situação por fonte",
        0, 37, 12, 6)
 painel("timeseries", "Registros por coleta",
        """select fim as time, fonte as metric, registros as value
-          from raw.execucoes where sucesso order by fim""",
+          from raw.execucoes where sucesso and $__timeFilter(fim) order by fim""",
        12, 37, 12, 6, formato="time_series",
        fieldConfig={"defaults": {"custom": {"drawStyle": "points", "pointSize": 8}}, "overrides": []})
 tabela("Alertas enviados",
-       "select enviado_em, local, tipo, entregue, mensagem from raw.alertas order by enviado_em desc limit 50",
+       "select enviado_em, local, tipo, entregue, mensagem from raw.alertas where $__timeFilter(enviado_em) order by enviado_em desc limit 50",
        0, 43, 24, 8, vazio="Nenhum alerta enviado ainda")
 
 dashboard = {

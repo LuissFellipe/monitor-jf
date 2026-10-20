@@ -486,7 +486,7 @@
           "rawQuery": true,
           "editorMode": "code",
           "format": "table",
-          "rawSql": "select bairro, dias_sem_luz + avisos_agua as ocorrencias\n          from marts.agg_bairros order by posicao limit 15"
+          "rawSql": "select bairro,\n                 count(distinct data) filter (where servico = 'luz')\n                 + count(distinct local) filter (where servico = 'agua' and bairro <> 'Nao Identificado') as ocorrencias\n          from marts.fct_interrupcoes where $__timeFilter(data)\n          group by bairro order by ocorrencias desc limit 15"
         }
       ],
       "fieldConfig": {
@@ -533,7 +533,7 @@
           "rawQuery": true,
           "editorMode": "code",
           "format": "table",
-          "rawSql": "select to_char(coalesce(data_evento, publicado_em), 'DD/MM/YYYY') as data, titulo,\n                 array_to_string(bairros, ', ') as bairros\n          from raw.cesama_avisos order by coalesce(data_evento, publicado_em) desc"
+          "rawSql": "select to_char(coalesce(data_evento, publicado_em), 'DD/MM/YYYY') as data, titulo,\n                 array_to_string(bairros, ', ') as bairros\n          from raw.cesama_avisos where $__timeFilter(coalesce(data_evento, publicado_em)) order by coalesce(data_evento, publicado_em) desc"
         }
       ],
       "fieldConfig": {
@@ -634,7 +634,7 @@
           "rawQuery": true,
           "editorMode": "code",
           "format": "time_series",
-          "rawSql": "select fim as time, fonte as metric, registros as value\n          from raw.execucoes where sucesso order by fim"
+          "rawSql": "select fim as time, fonte as metric, registros as value\n          from raw.execucoes where sucesso and $__timeFilter(fim) order by fim"
         }
       ],
       "fieldConfig": {
@@ -671,7 +671,7 @@
           "rawQuery": true,
           "editorMode": "code",
           "format": "table",
-          "rawSql": "select enviado_em, local, tipo, entregue, mensagem from raw.alertas order by enviado_em desc limit 50"
+          "rawSql": "select enviado_em, local, tipo, entregue, mensagem from raw.alertas where $__timeFilter(enviado_em) order by enviado_em desc limit 50"
         }
       ],
       "fieldConfig": {
